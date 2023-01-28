@@ -6,11 +6,9 @@ const state = {
     activeDay: null
 }
 
-const events = localStorage.getItem('events') ? JSON.parse(localStorage.getItem('events')) : [];
+let events = localStorage.getItem('events') ? JSON.parse(localStorage.getItem('events')) : [];
 
 initCalendar()
-
-
 
 
 function initCalendar() {
@@ -20,9 +18,22 @@ function initCalendar() {
         locale: getUserLocale(),
         date: {}
     }
+
     // get calendar element
-    const calEl = document.getElementById('up-calendar');
-    calEl.innerHTML = '';
+    const calWrapper = document.getElementById('up-calendar');
+    // clear calendar
+    calWrapper.innerHTML = '';
+
+    // add calendar container
+    const calEl = document.createElement('div');
+    calEl.classList.add('cal-el__calendar');
+    calWrapper.appendChild(calEl);
+
+    // add event container
+    const eventEl = document.createElement('div');
+    eventEl.classList.add('up-cal__event', 'up-event');
+    eventEl.id = "up-event";
+    calWrapper.appendChild(eventEl);
 
     // for a styles purposes
     calEl.classList.add('up-cal');
@@ -31,17 +42,15 @@ function initCalendar() {
     if (state.monthOffset !== 0) {
         now.setMonth(new Date().getMonth() + state.monthOffset);
     }
-    const day = now.getDay();
-    const date = now.getDate();
-    const month = now.getMonth();
-    const year = now.getFullYear();
-    config.date.day = day;
-    config.date.date = date;
-    config.date.month = month;
-    config.date.year = year;
+    config.date.day = now.getDay();
+    config.date.date = now.getDate();
+    config.date.month = now.getMonth();
+    config.date.year = now.getFullYear();
 
     // draw month view by default
     drawMonthView(calEl, config);
+
+    drawEventsView();
 }
 
 
@@ -81,17 +90,19 @@ function drawMonthView(calEl, config) {
         const dayEl = document.createElement('button')
         dayEl.type = "button";
         dayEl.classList.add('up-cal__day');
-        dayEl.dataset.date = `${year}${month}${i - offsetDays}`;
+        dayEl.dataset.date = `${year}-${month}-${i - offsetDays}`;
 
         // mark current date
         const now = new Date();
-        if (dayEl.dataset.date === `${now.getFullYear()}${now.getMonth()}${now.getDate()}`) {
-            dayEl.classList.add('up-cal__day-current');
+        if (dayEl.dataset.date === `${now.getFullYear()}-${now.getMonth()}-${now.getDate()}`) {
+            markDayAsToday(dayEl);
         }
 
         dayEl.innerText = (i).toString();
         // dayEl.addEventListener('click', (ev) => console.log(ev, dayEl))
         calEl.appendChild(dayEl);
+        markAsContainingEvent(dayEl);
+
     }
 
     // render next month
@@ -108,12 +119,15 @@ function drawMonthView(calEl, config) {
 
 function drawWeekdays(calEl, config) {
     const weekDays = config.weekdays;
+    const weekdaysEl = document.createElement('ul');
+    weekdaysEl.classList.add('up-cal__weekdays');
     for (let i = 0; i < weekDays.length; i++) {
-        const weekDayEl = document.createElement('div')
+        const weekDayEl = document.createElement('li')
         weekDayEl.classList.add('up-cal__weekday');
         weekDayEl.innerText = weekDays[i].substring(0, 3);
-        calEl.appendChild(weekDayEl);
+        weekdaysEl.appendChild(weekDayEl);
     }
+    calEl.appendChild(weekdaysEl);
 }
 
 
@@ -131,7 +145,7 @@ function drawCalendarNavigation(calEl, config) {
 
     const dateNavEl = document.createElement('button')
     dateNavEl.type = "button";
-    dateNavEl.classList.add('up-cal__date-info')
+    dateNavEl.classList.add('up-cal__date-month-year')
     dateNavEl.innerText = `${monthName} ${year}`;
 
     const monthPrevBtn = document.createElement('button');
@@ -161,13 +175,6 @@ function drawMonthsSelectView() {}
 function drawYearSelectView() {}
 
 
-// get user locale from browser
-function getUserLocale() {
-    // TODO: remove next line
-    return "en-US";
-    return navigator.languages && navigator.languages.length ? navigator.languages[0] : navigator.language; // 👉️ "en-US"
-}
-
 function initCalendarControls() {
     const prevMonthButton = document.getElementById('up-cal-prev');
     const nextMonthButton = document.getElementById('up-cal-next');
@@ -192,11 +199,9 @@ function initEventsHandler(calEl) {
         const selectedDate = dayBtn.dataset.date;
         state.activeDay = selectedDate;
 
-        dayBtn.classList.add('up-cal__day-active');
+        markDayAsActive(dayBtn);
 
-        // const obj
-
-        // events.push()
+        drawEventsView();
 
         // mark clicked day
         console.log('ADD EVENT HERE!', selectedDate);
@@ -204,13 +209,137 @@ function initEventsHandler(calEl) {
 }
 
 
-// format datetime
-// const now = new Date();
-// console.log('*** now: ', now)
+function drawEventsView() {
+    const eventsEl = document.getElementById('up-event');
+    eventsEl.innerHTML = "";
 
-// const formattedDate = new Intl.DateTimeFormat(getUserLocale()).format(now);
-// console.log('FormattedDate: ', formattedDate)
+    const selectedDayHasEvent = hasEvent(state.activeDay);
+    const dateEl = document.createElement('h6')
+    dateEl.innerText = getDateByDateStr(state.activeDay);
+    eventsEl.appendChild(dateEl);
 
-// const weekInfo = new Intl.Locale(userLocale).weekInfo
-// console.log('*** weekInfo: ', weekInfo)
-// console.log('*** weekInfo: ', new Intl.Locale("en-US").weekInfo)
+    if (selectedDayHasEvent) {
+        const eventTextEl = document.createElement('div');
+        eventTextEl.appendChild(prepareEventText('h2', state.activeDay));
+        eventsEl.appendChild(eventTextEl);
+        addEventForm(eventsEl);
+    } else {
+        const noItemsEl = document.createElement('div');
+        noItemsEl.classList.add()
+        noItemsEl.innerHTML = '<i>This day is free!</i>';
+        eventsEl.classList.add('up-event_center');
+        eventsEl.appendChild(noItemsEl);
+        addEventForm(eventsEl);
+    }
+}
+
+
+// Helpers
+
+function getUserLocale() {
+    // TODO: remove next line
+    return "en-US";
+    return navigator.languages && navigator.languages.length ? navigator.languages[0] : navigator.language; // 👉️ "en-US"
+}
+
+function markDayAsToday(dayEl) {
+    const date = dayEl.dataset.date;
+    dayEl.classList.add('up-cal__day-active');
+    dayEl.classList.add('up-cal__day-current');
+    state.activeDay = date;
+}
+
+function markDayAsActive(dayBtn) {
+    clearClassListFromDays('up-cal__day-active');
+    dayBtn.classList.add('up-cal__day-active');
+}
+
+function clearClassListFromDays(className) {
+    const calEl = document.getElementById('up-calendar');
+    calEl.querySelectorAll('.up-cal__day').forEach(el => el.classList.remove(className));
+}
+
+function markAsContainingEvent(dayEl) {
+    const date = dayEl.dataset.date;
+    if (events.filter(ev => ev.date === date)[0]) {
+        dayEl.classList.add('up-cal__day-marked');
+    }
+}
+
+function getEventByDate(dateStr) {
+    return events.filter(ev => ev.date === dateStr)[0];
+}
+
+function hasEvent(dateStr) {
+    return !!getEventByDate(dateStr);
+}
+
+// get calendar day by date
+function getDayElByDate(dateStr) {
+    return document
+        .getElementById('up-calendar')
+        .querySelector('[data-date="' + dateStr + '"]')
+}
+
+
+function addEventForm(eventsEl) {
+    const formEl = document.createElement('form');
+
+    const inputEl = document.createElement('input');
+    inputEl.placeholder = 'Add something to this day...'
+    formEl.appendChild(inputEl);
+
+    const submitBtn = document.createElement('button');
+    submitBtn.type = "submit";
+    submitBtn.innerText = "Add event";
+    formEl.appendChild(submitBtn);
+    eventsEl.appendChild(formEl);
+
+    inputEl.focus();
+
+    formEl.addEventListener('submit', e => {
+        e.preventDefault();
+        const event = { date: state.activeDay, title: inputEl.value };
+        addItemToStorage(event);
+        drawEventsView()
+    })
+}
+
+function addItemToStorage(event) {
+    const existingEv = events.filter(ev => ev.date === event.date)[0];
+    if (existingEv) {
+        existingEv.title = event.title;
+    } else {
+        events.push(event);
+        const el = getDayElByDate(event.date);
+        markAsContainingEvent(el)
+    }
+    localStorage.setItem('events', JSON.stringify(events));
+}
+
+function deleteItemFromStorage(event) {
+    console.log('*** event to delete: ', event)
+}
+
+function prepareEventText(tag, dateStr) {
+    const text = getEventByDate(dateStr).title;
+    const tagEl = document.createElement(tag);
+    tagEl.innerText = text;
+    return tagEl;
+}
+
+
+function getDateByDateStr(dateStr) {
+    const [year, month, day] = dateStr.split('-');
+    const now = new Date();
+    const isCurrentDate = year == now.getFullYear() && month == now.getMonth() && day == now.getDate();
+    if (isCurrentDate) {
+        return 'Today';
+    }
+    const date = new Date(year, month, day);
+    return date.toLocaleDateString(getUserLocale(), {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
+}
