@@ -1,0 +1,138 @@
+* {
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px;
+}
+
+body {
+    --cell-size: 2rem;
+    --cell-gap-size: .75rem;
+    --black-btn-bg: #001e00;
+
+    --white: #fff;
+    --gray-01: #5e6d55;
+    --gray-06: #f2f7f2;
+    --up-green: #14a800;
+    --brand-green: #108a00;
+    --forest: #13544e;
+    --blue: #1f57c3;
+
+
+    display: grid;
+    align-items: start;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+    padding: 1rem 0;
+
+    font-family: Arial, sans-serif;
+}
+
+.up-cal {
+    padding: 1rem;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    width: calc((7 * var(--cell-size)) + (6 * var(--cell-gap-size)) + 2rem);
+    flex-wrap: wrap;
+    gap: var(--cell-gap-size);
+    border-radius: calc(16px);
+    box-shadow: 8px 8px 31px -4px rgba(0, 0, 0, 0.19);
+}
+
+.up-cal__header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+}
+
+.up-cal__month-navigation {
+    display: flex;
+    gap: .5rem;
+}
+
+.up-cal__day-offset {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: var(--cell-size);
+    width: var(--cell-size);
+    font-size: .7rem;
+    color: var(--gray-01);
+    opacity: .4;
+    pointer-events: none;
+}
+
+.up-cal__weekday,
+.up-cal__day {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: var(--cell-size);
+    width: var(--cell-size);
+    font-size: .7rem;
+    color: var(--gray-01);
+}
+
+.up-cal__date-info,
+.up-cal__month-prev,
+.up-cal__month-next {
+    line-height: 1.5rem;
+}
+
+.up-cal__month-prev,
+.up-cal__month-next {
+    border-color: transparent;
+    border-radius: 4px;
+    appearance: none;
+    color: var(--gray-01);
+    background-color: var(--white);
+    cursor: pointer;
+}
+
+.up-cal__month-prev:focus-within,
+.up-cal__month-next:focus-within {
+    outline: 1px solid var(--gray-01);
+}
+
+.up-cal__date-info,
+.up-cal__day {
+    border-color: transparent;
+    border-radius: 4px;
+    outline: 1px solid var(--gray-01);
+    appearance: none;
+    color: var(--gray-01);
+    background-color: var(--white);
+    cursor: pointer;
+}
+
+.up-cal__day-current {
+    color: var(--white);
+    outline-color: var(--brand-green);
+    background-color: var(--brand-green);
+}
+
+.up-cal .padding {
+    opacity: .3;
+    pointer-events: none;
+}
+
+.up-cal__day:focus-within,
+.up-cal__month-prev:focus-within,
+.up-cal__month-next:focus-within,
+.up-cal__date-info:focus-within,
+
+.up-cal__date-info:active,
+.up-cal__month-prev:active,
+.up-cal__month-next:active,
+.up-cal__day:active,
+.up-cal__day-active {
+    outline-offset: 2px;
+    transition: all .2s ease-out;
+}
+
+.up-cal__day:focus-within {
+    transform: scale(1.2);
+}
