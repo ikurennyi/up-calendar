@@ -34,7 +34,7 @@ body {
 
 /* END reset and base styles */
 
-#up-calendar {
+.up-calendar {
     display: flex;
     flex-direction: row;
     align-items: stretch;
@@ -169,11 +169,6 @@ body {
     background-color: var(--up-green);
 }
 
-/*.up-cal__day:focus-within,*/
-/*.up-cal__day-active {*/
-/*    transform: scale(1.2);*/
-/*}*/
-
 .up-cal__day-marked {
     position: relative;
 }
@@ -191,12 +186,6 @@ body {
 /* END calendar styling */
 
 /* START event block styling */
-.q234234 {
-    --brand-green: #108a00;
-    --forest: #13544e;
-    --blue: #1f57c3;
-}
-
 .up-event {
     position: relative;
     display: flex;
@@ -219,13 +208,18 @@ body {
     text-align: right;
 }
 
-.up-event h2 {
+.up-event h2,
+.up-event i {
+    display: inline-block;
     margin: .5rem 0 0;
-    max-height: 200px;
-    overflow-y: auto;
     font-size: 1rem;
     line-height: 1.4rem;
     font-weight: normal;
+}
+
+.up-event h2 {
+    max-height: 200px;
+    overflow-y: auto;
 }
 
 .up-event_center {
@@ -274,7 +268,7 @@ body {
 
 
 @media screen and (max-width: 600px) {
-    #up-calendar {
+    .up-calendar {
         flex-direction: column;
     }
 
@@ -292,7 +286,7 @@ body {
         background-color: #000;
     }
 
-    #up-calendar {
+    .up-calendar {
         height: 100vh;
         width: 100vw;
     }
