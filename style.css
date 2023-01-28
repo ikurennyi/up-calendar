@@ -217,6 +217,10 @@ body {
     font-weight: normal;
 }
 
+.up-event i {
+    color: rgb(94 109 85 / 39%);
+}
+
 .up-event h2 {
     max-height: 200px;
     overflow-y: auto;

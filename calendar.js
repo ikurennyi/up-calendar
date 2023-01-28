@@ -93,7 +93,8 @@ export class UpCalendar {
             dayEl.dataset.date = `${year}-${month}-${i - offsetDays}`;
 
             // mark current date
-            if (dayEl.dataset.date === `${this.config.date.year}-${this.config.date.month}-${this.config.date.date}`) {
+            const now = new Date();
+            if (dayEl.dataset.date === `${now.getFullYear()}-${now.getMonth()}-${now.getDate()}`) {
                 this.markDayAsToday(dayEl);
             }
 
