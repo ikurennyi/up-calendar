@@ -11,7 +11,7 @@ export class UpCalendar {
     calEl;
     config = {
         weekdays: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
-        firstDayOfWeek: 'Sunday', // TODO use and improve this
+        firstDayOfWeek: 'Sunday',
         locale: 'en-US',
         date: {},
         monthOffset: 0,
@@ -29,13 +29,11 @@ export class UpCalendar {
         this.calWrapper.classList.add('up-calendar');
 
         // add calendar container
-        this.calEl = this.createTag("div", { classList: "cal-el__calendar" });
+        this.calEl = this.createTag("div", { classList: ["cal-el__calendar"] });
         this.calWrapper.appendChild(this.calEl);
 
         // add event container
-        const eventEl = this.createTag("div", { classList: "up-cal__event" });
-        // TODO: classList
-        eventEl.classList.add('up-event');
+        const eventEl = this.createTag("div", { classList: ["up-cal__event", "up-event"] });
         eventEl.id = "up-event";
         this.calWrapper.appendChild(eventEl);
 
@@ -82,13 +80,13 @@ export class UpCalendar {
         // render previous month
         const lastDayOfLastMonth = new Date(year, month, 0).getDate();
         for (let i = firstDayOfMonth.getDay(); i > 0; i--) {
-            const dayEl = this.createTag("div", { content: `${lastDayOfLastMonth - i + 1}`, classList: "up-cal__day-offset" });
+            const dayEl = this.createTag("div", { content: `${lastDayOfLastMonth - i + 1}`, classList: ["up-cal__day-offset"] });
             this.calEl.appendChild(dayEl);
         }
 
         // render current month
         for (let i = 1; i <= daysInMonth; i ++) {
-            const dayEl = this.createTag("button", { classList: "up-cal__day" })
+            const dayEl = this.createTag("button", { classList: ["up-cal__day"] })
             dayEl.type = "button";
             dayEl.dataset.date = `${year}-${month}-${i - offsetDays}`;
 
@@ -108,7 +106,7 @@ export class UpCalendar {
         // render next month
         const lastDayOfMonth = new Date(year, month, daysInMonth).getDay();
         for (let i = lastDayOfMonth; i < 6; i++) {
-            const dayEl = this.createTag("div", { content: `${i - lastDayOfMonth + 1}`, classList: "up-cal__day-offset" });
+            const dayEl = this.createTag("div", { content: `${i - lastDayOfMonth + 1}`, classList: ["up-cal__day-offset"] });
             this.calEl.appendChild(dayEl);
         }
 
@@ -129,7 +127,7 @@ export class UpCalendar {
             eventsEl.appendChild(eventTextEl);
             this.addEventForm(eventsEl);
         } else {
-            const noItemsEl = this.createTag("div", { isHTML: true, content: "<i>This day is free!</i>", classList: "up-event_center"});
+            const noItemsEl = this.createTag("div", { isHTML: true, content: "<i>This day is free!</i>", classList: ["up-event_center"] });
             // noItemsEl.classList.add()
             eventsEl.appendChild(noItemsEl);
             this.addEventForm(eventsEl);
@@ -145,20 +143,20 @@ export class UpCalendar {
         // some locales provide us month name in lowercase
         monthName = monthName.charAt(0).toUpperCase() + monthName.slice(1)
 
-        const headerEl = this.createTag('header', {classList: "up-cal__header"});
+        const headerEl = this.createTag('header', {classList: ["up-cal__header"] });
 
-        const dateNavEl = this.createTag('button', { content: `${monthName} ${year}`, classList: "up-cal__date-month-year"})
+        const dateNavEl = this.createTag('button', { content: `${monthName} ${year}`, classList: ["up-cal__date-month-year"] })
         dateNavEl.type = "button";
 
-        const monthPrevBtn = this.createTag('button', {isHTML: true, content: "&#8592;", classList: "up-cal__month-prev"});
+        const monthPrevBtn = this.createTag('button', {isHTML: true, content: "&#8592;", classList: ["up-cal__month-prev"] });
         monthPrevBtn.type = "button";
         monthPrevBtn.id = 'up-cal-prev';
 
-        const monthNextBtn = this.createTag("button", { isHTML: true, content: "&#8594;", classList: "up-cal__month-next"});
+        const monthNextBtn = this.createTag("button", { isHTML: true, content: "&#8594;", classList: ["up-cal__month-next"] });
         monthNextBtn.type = "button";
         monthNextBtn.id = 'up-cal-next';
 
-        const monthNavigationButtons = this.createTag("div", { classList: 'up-cal__month-navigation'});
+        const monthNavigationButtons = this.createTag("div", { classList: ["up-cal__month-navigation"] });
         monthNavigationButtons.appendChild(monthPrevBtn);
         monthNavigationButtons.appendChild(monthNextBtn);
 
@@ -307,10 +305,10 @@ export class UpCalendar {
         return this.createTag(tag, { content });
     }
 
-    createTag(tag, { isHTML = false, content = '', classList = '' } = {}) {
+    createTag(tag, { isHTML = false, content = '', classList = [] } = {}) {
         const htmlEl = document.createElement(tag);
         if (classList) {
-            htmlEl.classList.add(classList)
+            htmlEl.classList.add(...classList);
         }
         if (isHTML) {
             htmlEl.innerHTML = content;
