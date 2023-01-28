@@ -53,14 +53,13 @@ function initCalendar() {
     drawEventsView();
 }
 
-
 function drawMonthView(calEl, config) {
     const { year, month, day, date } = config.date;
     const firstDayOfMonth = new Date(year, month, 1);
 
     // draw navigation controls
     drawCalendarNavigation(calEl, config);
-    initCalendarControls()
+    initMonthControls()
 
     // draw weekdays
     drawWeekdays(calEl, config);
@@ -93,8 +92,7 @@ function drawMonthView(calEl, config) {
         dayEl.dataset.date = `${year}-${month}-${i - offsetDays}`;
 
         // mark current date
-        const now = new Date();
-        if (dayEl.dataset.date === `${now.getFullYear()}-${now.getMonth()}-${now.getDate()}`) {
+        if (dayEl.dataset.date === `${config.date.year}-${config.date.month}-${config.date.date}`) {
             markDayAsToday(dayEl);
         }
 
@@ -129,7 +127,6 @@ function drawWeekdays(calEl, config) {
     }
     calEl.appendChild(weekdaysEl);
 }
-
 
 function drawCalendarNavigation(calEl, config) {
     const { year, month } = config.date;
@@ -170,12 +167,11 @@ function drawCalendarNavigation(calEl, config) {
     calEl.appendChild(headerEl);
 }
 
-
 function drawMonthsSelectView() {}
+
 function drawYearSelectView() {}
 
-
-function initCalendarControls() {
+function initMonthControls() {
     const prevMonthButton = document.getElementById('up-cal-prev');
     const nextMonthButton = document.getElementById('up-cal-next');
 
@@ -208,7 +204,6 @@ function initEventsHandler(calEl) {
     })
 }
 
-
 function drawEventsView() {
     const eventsEl = document.getElementById('up-event');
     eventsEl.innerHTML = "";
@@ -237,9 +232,8 @@ function drawEventsView() {
 // Helpers
 
 function getUserLocale() {
-    // TODO: remove next line
     return "en-US";
-    return navigator.languages && navigator.languages.length ? navigator.languages[0] : navigator.language; // 👉️ "en-US"
+    // return navigator.languages && navigator.languages.length ? navigator.languages[0] : navigator.language; // 👉️ "en-US"
 }
 
 function markDayAsToday(dayEl) {
@@ -274,13 +268,11 @@ function hasEvent(dateStr) {
     return !!getEventByDate(dateStr);
 }
 
-// get calendar day by date
 function getDayElByDate(dateStr) {
     return document
         .getElementById('up-calendar')
         .querySelector('[data-date="' + dateStr + '"]')
 }
-
 
 function addEventForm(eventsEl) {
     const formEl = document.createElement('form');
@@ -299,6 +291,9 @@ function addEventForm(eventsEl) {
 
     formEl.addEventListener('submit', e => {
         e.preventDefault();
+        if (inputEl.value.trim().length === 0) {
+            return;
+        }
         const event = { date: state.activeDay, title: inputEl.value };
         addItemToStorage(event);
         drawEventsView()
@@ -317,17 +312,12 @@ function addItemToStorage(event) {
     localStorage.setItem('events', JSON.stringify(events));
 }
 
-function deleteItemFromStorage(event) {
-    console.log('*** event to delete: ', event)
-}
-
 function prepareEventText(tag, dateStr) {
     const text = getEventByDate(dateStr).title;
     const tagEl = document.createElement(tag);
     tagEl.innerText = text;
     return tagEl;
 }
-
 
 function getDateByDateStr(dateStr) {
     const [year, month, day] = dateStr.split('-');
