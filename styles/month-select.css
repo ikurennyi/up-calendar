@@ -8,20 +8,35 @@
     flex-direction: column;
     padding: 1rem 2rem;
     border-radius: 16px;
+    overflow: hidden;
     background-color: var(--white);
 }
-
-.up-cal__select-months,
-.up-cal__select-years {
+.up-cal__select-months ul,
+.up-cal__select-years ul {
     margin: 0;
     padding: 0;
     list-style-type: none;
     display: flex;
     flex-wrap: wrap;
     gap: 1rem;
+    height: 100%;
 }
 
-.up-cal__select header {
+.up-cal__select-years,
+.up-cal__select-months {
+    position: relative;
+    flex-grow: 1;
+    display: flex;
+    justify-content: stretch;
+}
+
+.up-select__header {
+    position: relative;
+    width: 100%;
+    min-height: 44px;
+}
+
+.up-select__header-content {
     display: flex;
     align-items: center;
     justify-content: space-between;

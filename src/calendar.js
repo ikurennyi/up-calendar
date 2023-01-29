@@ -286,13 +286,20 @@ export class UpCalendar {
 
         // make a wrapper
         this.selectMonthViewEl = this.createTag('div', { classList: ['up-cal__select'] });
-        // header
-        this.setSelectMonthHeader();
-        // year view (by default)
-        this.showSelectMonthAtYear();
 
         // append all content to wrapper
-        this.calEl.appendChild(this.selectMonthViewEl);
+        makeAnim({
+            newEl: this.selectMonthViewEl,
+            old: this.calEl,
+            place: 'beforeend',
+            duration: 100,
+            effect: 'justAppear',
+        }).then(() => {
+            // header
+            this.setSelectMonthHeader();
+            // year view (by default)
+            this.showSelectMonthAtYear();
+        });
     }
 
     setSelectMonthHeader(titleFor = 'year') {
@@ -311,8 +318,12 @@ export class UpCalendar {
     createSelectMonthHeaderForYear() {
         this.selectMonthViewHeaderEl = this.createTag('header', {
             classList: ['up-select__header'],
+        });
+
+        const headerContentEl = this.createTag('div', {
+            classList: ['up-select__header-content'],
             isHTML: true,
-            content: `<h4>Select year</h4>`,
+            content: '<h4>Select year</h4>',
         });
 
         // show previous 12 years
@@ -332,16 +343,25 @@ export class UpCalendar {
         nextYearBtn.addEventListener('click', () => this.showSelectMonthAtYear('next'));
 
         // add the navigation buttons
-        this.selectMonthViewHeaderEl.insertAdjacentElement('afterBegin', prevYearBtn);
-        this.selectMonthViewHeaderEl.insertAdjacentElement('beforeEnd', nextYearBtn);
+        headerContentEl.insertAdjacentElement('beforeEnd', nextYearBtn);
+        headerContentEl.insertAdjacentElement('afterBegin', prevYearBtn);
 
-        // show prepared header
         this.selectMonthViewEl.appendChild(this.selectMonthViewHeaderEl);
+        this.selectMonthViewHeaderEl.appendChild(headerContentEl);
+        // show prepared header
+        makeAnim({
+            newEl: headerContentEl,
+            old: this.selectMonthViewHeaderEl,
+            place: 'beforeend',
+            effect: 'justAppear',
+            duration: 400,
+        });
     }
 
     showSelectMonthAtYear(direction = undefined) {
         const monthCountAtView = 12;
-        this.yearBtnsList ||= this.createTag('ul', { classList: ['up-cal__select-years'] });
+        this.yearBtnsList ||= this.createTag('div', { classList: ['up-cal__select-years'] });
+        const btnsList = this.createTag('ul');
 
         let yearToStart;
         switch (direction) {
@@ -357,7 +377,6 @@ export class UpCalendar {
         }
 
         const startYearAtTheView = yearToStart - 7;
-        this.yearBtnsList.innerHTML = '';
         for (let i = 0; i < monthCountAtView; i++) {
             const btnLi = this.createTag('li');
             const btnClass = startYearAtTheView + i === this.config.date.year && 'up-cal_active';
@@ -366,21 +385,40 @@ export class UpCalendar {
             yearBtn.value = startYearAtTheView + i;
             yearBtn.addEventListener('click', (e) => this.showSelectMonthAtMonth(startYearAtTheView + i));
             btnLi.appendChild(yearBtn);
-            this.yearBtnsList.appendChild(btnLi);
+            btnsList.appendChild(btnLi);
         }
-
         this.selectMonthViewEl.appendChild(this.yearBtnsList);
 
-        this._focusButtonOnRender(this.yearBtnsList);
+        if (direction) {
+            const old = this.yearBtnsList.querySelector('ul');
+            const dir = direction === 'next' ? 'left' : 'right';
+            makeAnim({
+                newEl: btnsList,
+                old,
+                place: 'afterend',
+                direction: dir,
+            }).then(() => this._focusButtonOnRender(this.yearBtnsList));
+        } else {
+            makeAnim({
+                newEl: btnsList,
+                old: this.yearBtnsList,
+                place: 'beforeend',
+                effect: 'justAppear',
+            }).then(() => this._focusButtonOnRender(this.yearBtnsList));
+        }
     }
 
     showSelectMonthAtMonth(year) {
         const now = new Date();
         this.config.dateToSelect.year = year;
 
+        // TODO: add animation here
         this.setSelectMonthHeader('month');
 
-        this.monthBtnsList = this.createTag('ul', { classList: ['up-cal__select-months'] });
+        this.monthBtnsList = this.createTag('div', { classList: ['up-cal__select-months'] });
+        const btnsList = this.createTag('ul');
+        this.monthBtnsList.appendChild(btnsList);
+
         // mark active month and year if compares
         for (let i = 0; i < this.config.months.length; i++) {
             const monthNameEl = this.createTag('li');
@@ -390,7 +428,7 @@ export class UpCalendar {
             monthBtn.value = i;
             monthBtn.addEventListener('click', () => this.selectMonth(i));
             monthNameEl.appendChild(monthBtn);
-            this.monthBtnsList.appendChild(monthNameEl);
+            btnsList.appendChild(monthNameEl);
         }
 
         const selectDateEl = this.calEl.querySelector('.up-cal__select');
@@ -483,6 +521,7 @@ export class UpCalendar {
             const event = { date: this.config.activeDay, title: inputEl.value };
             this.addItemToStorage(event);
             this.drawEventView();
+            inputEl.value = '';
         });
     }
 
