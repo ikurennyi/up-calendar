@@ -1,0 +1,71 @@
+.up-cal__select {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 1rem 2rem;
+    border-radius: 16px;
+    background-color: var(--white);
+}
+
+.up-cal__select-months,
+.up-cal__select-years {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.up-cal__select header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.up-cal__select h4 {
+    position: relative;
+    margin: 1rem 0;
+    font-weight: normal;
+}
+
+.up-cal__select ul {
+    flex-grow: 1;
+}
+
+.up-cal__select li {
+    display: flex;
+    width: calc((100% - 2 * 1rem) / 3);
+}
+
+.up-cal__select button {
+    appearance: none;
+    border-color: transparent;
+    border-radius: 4px;
+    outline: 1px solid transparent;
+    appearance: none;
+    color: var(--gray-01);
+    background-color: var(--white);
+    cursor: pointer;
+}
+
+.up-cal__select ul button {
+    width: 100%;
+
+}
+
+.up-cal__select .up-cal_active {
+    color: var(--white);
+    background-color: var(--forest);
+}
+
+.up-cal__select button:hover,
+.up-cal__select button:focus-within {
+    outline-color: var(--gray-01);
+    outline-offset: 2px;
+    transition: outline .2s ease-out;
+}

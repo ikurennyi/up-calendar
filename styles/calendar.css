@@ -1,0 +1,155 @@
+.up-calendar {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+}
+
+.cal-el__calendar {
+    position: relative;
+    padding: calc(var(--cell-gap-size) / 2) 1rem;
+    width: calc((7 * var(--cell-size)) + (6 * var(--cell-gap-size)) + 2rem);
+    flex-wrap: wrap;
+    border-radius: 16px;
+    box-shadow: 8px 8px 31px -4px rgba(0, 0, 0, 0.19);
+    background-color: var(--white);
+    z-index: 2;
+}
+
+.up-cal__header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding: calc(var(--cell-gap-size) / 2) 0;
+}
+
+.up-cal__month-navigation {
+    display: flex;
+    gap: .5rem;
+}
+
+.up-cal__day-offset {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: var(--cell-size);
+    width: var(--cell-size);
+    font-size: .7rem;
+    color: var(--gray-01);
+    opacity: .4;
+    pointer-events: none;
+}
+
+.up-cal__weekdays {
+    display: flex;
+    align-items: center;
+    margin: calc(var(--cell-gap-size) / 2) 0;
+    padding: 0;
+    list-style-type: none;
+    width: 100%;
+    gap: var(--cell-gap-size);
+}
+
+.up-cal__weekday,
+.up-cal__day {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: var(--cell-size);
+    width: var(--cell-size);
+    font-size: .7rem;
+    color: var(--gray-01);
+}
+
+.up-cal__date-month-year,
+.up-cal__month-prev,
+.up-cal__month-next {
+    line-height: 1.5rem;
+}
+
+.up-cal__month-prev,
+.up-cal__month-next {
+    border-color: transparent;
+    border-radius: 4px;
+    appearance: none;
+    color: var(--gray-01);
+    background-color: var(--white);
+    cursor: pointer;
+    outline: 1px solid transparent;
+    transition: outline .2s ease-out;
+}
+
+.up-cal__month-prev:focus-within,
+.up-cal__month-next:focus-within,
+.up-cal__month-prev:hover,
+.up-cal__month-next:hover {
+    outline-color: var(--gray-01);
+}
+
+.up-cal__date-month-year,
+.up-cal__day {
+    border-color: transparent;
+    border-radius: 4px;
+    outline: 1px solid transparent;
+    appearance: none;
+    color: var(--gray-01);
+    background-color: var(--white);
+    cursor: pointer;
+}
+
+.cal-el__calendar .padding {
+    opacity: .3;
+    pointer-events: none;
+}
+
+.up-cal__day:hover,
+.up-cal__day:focus-within,
+.up-cal__month-prev:focus-within,
+.up-cal__month-next:focus-within,
+.up-cal__month-prev:hover,
+.up-cal__month-next:hover,
+.up-cal__date-month-year:focus-within,
+.up-cal__date-month-year:hover {
+    outline-color: var(--gray-01);
+    outline-offset: 2px;
+    transition: outline .2s ease-out;
+}
+
+.up-cal__day-active {
+    background-color: var(--gray-06);
+}
+
+.up-cal__day-active:hover {
+    outline-color: var(--gray-01);
+    outline-offset: 2px;
+}
+
+.up-cal__day-current {
+    color: var(--white);
+    outline-color: var(--up-green);
+    background-color: var(--up-green);
+}
+
+.up-cal__day-marked {
+    position: relative;
+}
+
+.up-cal__day-marked::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: .2rem;
+    height: 2px;
+    width: 1rem;
+    transform: translateX(-50%);
+    background-color: var(--brand-green);
+}
+
+.up-cal__months-wrapper {
+    padding: calc(var(--cell-gap-size) / 2) 0;
+}
+
+.up-cal__month-item {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--cell-gap-size);
+}

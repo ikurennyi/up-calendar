@@ -1,0 +1,82 @@
+.up-event {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 300px;
+    margin-left: -20px;
+    padding: 1rem 1rem 1rem 2.5rem;
+    border-radius: 16px;
+    color: var(--forest);
+    background-color: var(--gray-06);
+    z-index: 1;
+}
+
+.up-event > div {
+    flex-grow: 1;
+}
+
+.up-event h6 {
+    margin: 0;
+    text-align: right;
+}
+
+.up-event h2,
+.up-event i {
+    display: inline-block;
+    margin: .5rem 0 0;
+    font-size: 1rem;
+    line-height: 1.4rem;
+    font-weight: normal;
+}
+
+.up-event i {
+    color: rgb(94 109 85 / 39%);
+}
+
+.up-event h2 {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.up-event_center {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    color: var(--gray-01);
+}
+
+.up-event form {
+}
+
+.up-event input {
+    border: none;
+    font-family: Arial, sans-serif;
+    line-height: 1.2rem;
+    width: 100%;
+    padding: .5rem;
+    outline: 1px solid var(--gray-01);
+    appearance: none;
+    color: var(--forest);
+    background-color: var(--white);
+    border-radius: 8px;
+    resize: none;
+}
+
+.up-event button {
+    margin-top: 1rem;
+    appearance: none;
+    border: none;
+    color: var(--white);
+    width: 100%;
+    font-size: 1rem;
+    background-color: var(--forest);
+    padding: .5rem .5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform .2s ease-out;
+}
+
+.up-event button:focus-within {
+    outline: 1px solid var(--gray-01);
+    transform: scale(1.1);
+}
