@@ -45,9 +45,6 @@
     color: var(--gray-01);
 }
 
-.up-event form {
-}
-
 .up-event input {
     border: none;
     font-family: Arial, sans-serif;
@@ -73,10 +70,13 @@
     padding: .5rem .5rem;
     border-radius: 8px;
     cursor: pointer;
-    transition: transform .2s ease-out;
 }
 
 .up-event button:focus-within {
     outline: 1px solid var(--gray-01);
-    transform: scale(1.1);
+    outline-offset: 2px;
+}
+
+.up-event button:active {
+    outline-offset: 0;
 }

@@ -16,10 +16,13 @@
 }
 
 .up-cal__header {
-    width: 100%;
+    position: relative;
     display: flex;
     justify-content: space-between;
-    padding: calc(var(--cell-gap-size) / 2) 0;
+    padding: 0 3px;
+    margin-left: -3px;
+    margin-right: -3px;
+    overflow: hidden;
 }
 
 .up-cal__month-navigation {
@@ -61,13 +64,12 @@
 }
 
 .up-cal__date-month-year,
-.up-cal__month-prev,
-.up-cal__month-next {
+.up-cal__btn-head {
+    margin: 5px 0;
     line-height: 1.5rem;
 }
 
-.up-cal__month-prev,
-.up-cal__month-next {
+.up-cal__btn-head {
     border-color: transparent;
     border-radius: 4px;
     appearance: none;
@@ -78,10 +80,8 @@
     transition: outline .2s ease-out;
 }
 
-.up-cal__month-prev:focus-within,
-.up-cal__month-next:focus-within,
-.up-cal__month-prev:hover,
-.up-cal__month-next:hover {
+.up-cal__btn-head:focus-within,
+.up-cal__btn-head:hover {
     outline-color: var(--gray-01);
 }
 
@@ -103,15 +103,13 @@
 
 .up-cal__day:hover,
 .up-cal__day:focus-within,
-.up-cal__month-prev:focus-within,
-.up-cal__month-next:focus-within,
-.up-cal__month-prev:hover,
-.up-cal__month-next:hover,
+.up-cal__btn-head:focus-within,
+.up-cal__btn-head:hover,
 .up-cal__date-month-year:focus-within,
 .up-cal__date-month-year:hover {
     outline-color: var(--gray-01);
     outline-offset: 2px;
-    transition: outline .2s ease-out;
+    transition: all .2s ease-out;
 }
 
 .up-cal__day-active {
@@ -145,11 +143,17 @@
 }
 
 .up-cal__months-wrapper {
-    padding: calc(var(--cell-gap-size) / 2) 0;
+    position: relative;
+    margin-left: -3px;
+    margin-right: -3px;
+    padding-left: 3px;
+    padding-right: 3px;
+    overflow: hidden;
 }
 
 .up-cal__month-item {
     display: flex;
     flex-wrap: wrap;
+    margin: 10px 0;
     gap: var(--cell-gap-size);
 }

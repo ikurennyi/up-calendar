@@ -42,12 +42,11 @@
     width: calc((100% - 2 * 1rem) / 3);
 }
 
-.up-cal__select button {
+.up-cal__select ul button {
     appearance: none;
     border-color: transparent;
     border-radius: 4px;
     outline: 1px solid transparent;
-    appearance: none;
     color: var(--gray-01);
     background-color: var(--white);
     cursor: pointer;
@@ -55,7 +54,6 @@
 
 .up-cal__select ul button {
     width: 100%;
-
 }
 
 .up-cal__select .up-cal_active {
@@ -63,8 +61,8 @@
     background-color: var(--forest);
 }
 
-.up-cal__select button:hover,
-.up-cal__select button:focus-within {
+.up-cal__select ul button:hover,
+.up-cal__select ul button:focus-within {
     outline-color: var(--gray-01);
     outline-offset: 2px;
     transition: outline .2s ease-out;
