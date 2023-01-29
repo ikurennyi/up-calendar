@@ -1,3 +1,5 @@
+import makeAnim, { makeCleanup } from './make-anim.js';
+
 export class UpCalendar {
     calWrapper;
     calEl;
@@ -69,7 +71,6 @@ export class UpCalendar {
         this.drawEventView();
     }
 
-    // TODO: should be more clean and clear
     drawMonthView(isInit = true) {
         const { year, month } = this.config.date;
         const firstDayOfMonth = new Date(year, month, 1);
@@ -83,16 +84,7 @@ export class UpCalendar {
             monthsWrapperEl = this.calEl.querySelector('.up-cal__months-wrapper');
         }
 
-        monthsWrapperEl.innerHTML = '';
-
-        const monthElClassList = isInit
-            ? ['up-cal__month-item']
-            : [
-                  'up-cal__month-item',
-                  'up-cal__month-item_new',
-                  goesNextMonth ? 'up-cal__month-item_new-top' : 'up-cal__month-item_new-bottom',
-              ];
-        const monthEl = this.createTag('div', { classList: monthElClassList });
+        const monthEl = this.createTag('div', { classList: ['up-cal__month-item'] });
 
         // render previous month
         const lastDayOfLastMonth = new Date(year, month, 0).getDate();
@@ -117,7 +109,6 @@ export class UpCalendar {
             }
 
             dayEl.innerText = i.toString();
-            // dayEl.addEventListener('click', (ev) => console.log(ev, dayEl))
             monthEl.appendChild(dayEl);
             this.markAsContainingEvent(dayEl);
         }
@@ -133,10 +124,13 @@ export class UpCalendar {
         }
 
         // append/prepend month view depending on the desired direction (prev/next)
-        if (goesNextMonth) {
+        if (isInit) {
             monthsWrapperEl.insertAdjacentElement('beforeEnd', monthEl);
         } else {
-            monthsWrapperEl.insertAdjacentElement('afterBegin', monthEl);
+            const old = monthsWrapperEl.querySelector('.up-cal__month-item');
+            const direction = goesNextMonth ? 'up' : 'down';
+            const place = goesNextMonth ? 'beforeend' : 'afterbegin';
+            makeAnim({ newEl: monthEl, old, place, direction });
         }
 
         this.calEl.appendChild(monthsWrapperEl);
@@ -176,6 +170,7 @@ export class UpCalendar {
     drawMonthBtn(isInitial = true) {
         const { year, month } = this.config.date;
         const nextDate = new Date(year, month + 1, 0);
+
         let monthName = nextDate.toLocaleDateString(this.config.locale, {
             month: 'long',
         });
@@ -191,7 +186,21 @@ export class UpCalendar {
 
             this.headerEl.appendChild(this.selectDateBtn);
         } else {
-            this.selectDateBtn.innerText = `${monthName} ${year}`;
+            // create new button
+            const btn = this.createTag('button', {
+                content: `${monthName} ${year}`,
+                classList: ['up-cal__date-month-year'],
+            });
+            this.selectDateBtn.type = 'button';
+
+            // animate new button
+            const direction = this.config.monthOffset > 0 ? 'up' : 'down';
+            makeAnim({
+                newEl: btn,
+                old: this.selectDateBtn,
+                place: 'afterend',
+                direction,
+            }).then(() => (this.selectDateBtn = btn));
         }
     }
 
@@ -199,14 +208,14 @@ export class UpCalendar {
         this.prevMonthBtn = this.createTag('button', {
             isHTML: true,
             content: '&#8592;',
-            classList: ['up-cal__month-prev'],
+            classList: ['up-cal__month-prev', 'up-cal__btn-head'],
         });
         this.prevMonthBtn.type = 'button';
 
         this.nextMonthBnt = this.createTag('button', {
             isHTML: true,
             content: '&#8594;',
-            classList: ['up-cal__month-next'],
+            classList: ['up-cal__month-next', 'up-cal__btn-head'],
         });
         this.nextMonthBnt.type = 'button';
 
@@ -217,11 +226,17 @@ export class UpCalendar {
         this.headerEl.appendChild(monthNavigationButtons);
     }
 
-    // TODO: re-write this code somehow
     initMonthControls() {
-        this.prevMonthBtn.addEventListener('click', () => this.goPrevMonth());
-        this.nextMonthBnt.addEventListener('click', () => this.goNextMonth());
-        this.selectDateBtn.addEventListener('click', () => this.showSelectMonthView());
+        this.headerEl.addEventListener('click', (e) => {
+            const targetClassList = e.target.classList;
+            if (targetClassList.contains('up-cal__month-next')) {
+                this.goNextMonth();
+            } else if (targetClassList.contains('up-cal__month-prev')) {
+                this.goPrevMonth();
+            } else if (targetClassList.contains('up-cal__date-month-year')) {
+                this.showSelectMonthView();
+            }
+        });
     }
 
     goPrevMonth() {
@@ -293,7 +308,7 @@ export class UpCalendar {
         const prevYearBtn = this.createTag('button', {
             isHTML: true,
             content: '&#8592;',
-            classList: ['up-cal__month-prev'],
+            classList: ['up-cal__month-prev', 'up-cal__btn-head'],
         });
         prevYearBtn.addEventListener('click', () => this.showSelectMonthAtYear('prev'));
 
@@ -301,7 +316,7 @@ export class UpCalendar {
         const nextYearBtn = this.createTag('button', {
             isHTML: true,
             content: '&#8594;',
-            classList: ['up-cal__month-next'],
+            classList: ['up-cal__month-next', 'up-cal__btn-head'],
         });
         nextYearBtn.addEventListener('click', () => this.showSelectMonthAtYear('next'));
 
@@ -423,9 +438,6 @@ export class UpCalendar {
             this.markDayAsActive(dayBtn);
 
             this.drawEventView();
-
-            // mark clicked day
-            console.log('ADD EVENT HERE!', selectedDate);
         });
     }
 
