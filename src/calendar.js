@@ -17,8 +17,6 @@ export class UpCalendar {
         useLocalStorage: true
     }
 
-    // events;
-
     constructor(selector, config) {
         this.calWrapper = document.querySelector(selector);
         this.config = { ...this.config, ...config };
@@ -56,6 +54,13 @@ export class UpCalendar {
         this.config.date.month = now.getMonth();
         this.config.date.year = now.getFullYear();
 
+        // draw navigation controls
+        this.drawCalendarNavigation();
+        this.initMonthControls()
+
+        // draw weekdays
+        this.drawWeekdays();
+
         // draw month view by default
         this.drawMonthView();
 
@@ -64,14 +69,8 @@ export class UpCalendar {
 
     drawMonthView() {
         const { year, month } = this.config.date;
+        const now = new Date();
         const firstDayOfMonth = new Date(year, month, 1);
-
-        // draw navigation controls
-        this.drawCalendarNavigation();
-        this.initMonthControls()
-
-        // draw weekdays
-        this.drawWeekdays();
 
         const dateString = firstDayOfMonth.toLocaleDateString( this.config.locale,{
             weekday: 'long',
@@ -98,7 +97,6 @@ export class UpCalendar {
             dayEl.dataset.date = `${year}-${month}-${i - offsetDays}`;
 
             // mark current date
-            const now = new Date();
             if (dayEl.dataset.date === `${now.getFullYear()}-${now.getMonth()}-${now.getDate()}`) {
                 this.markDayAsToday(dayEl);
             }
