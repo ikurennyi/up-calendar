@@ -3,8 +3,6 @@
 // January 1st - Sunday. Which is "0" index in USA and "6" index in UA
 
 
-let events = localStorage.getItem('events') ? JSON.parse(localStorage.getItem('events')) : [];
-
 
 export class UpCalendar {
     calWrapper;
@@ -15,12 +13,21 @@ export class UpCalendar {
         locale: 'en-US',
         date: {},
         monthOffset: 0,
-        activeDay: null
+        activeDay: null,
+        useLocalStorage: true
     }
+
+    // events;
 
     constructor(selector, config) {
         this.calWrapper = document.querySelector(selector);
         this.config = { ...this.config, ...config };
+
+        if (this.config.useLocalStorage) {
+            this.events = localStorage.getItem('events') ? JSON.parse(localStorage.getItem('events')) : [];
+        } else {
+            this.events = [];
+        }
     }
 
     initCalendar() {
@@ -193,7 +200,7 @@ export class UpCalendar {
 
     markAsContainingEvent(dayEl) {
         const date = dayEl.dataset.date;
-        if (events.filter(ev => ev.date === date)[0]) {
+        if (this.events.filter(ev => ev.date === date)[0]) {
             dayEl.classList.add('up-cal__day-marked');
         }
     }
@@ -260,15 +267,15 @@ export class UpCalendar {
     }
 
     addItemToStorage(event) {
-        const existingEv = events.filter(ev => ev.date === event.date)[0];
+        const existingEv = this.events.filter(ev => ev.date === event.date)[0];
         if (existingEv) {
             existingEv.title = event.title;
         } else {
-            events.push(event);
+            this.events.push(event);
             const el = this.getDayElByDate(event.date);
             this.markAsContainingEvent(el)
         }
-        localStorage.setItem('events', JSON.stringify(events));
+        this.config.useLocalStorage && localStorage.setItem('events', JSON.stringify(this.events));
     }
 
     getDayElByDate(dateStr) {
@@ -280,7 +287,7 @@ export class UpCalendar {
     }
 
     getEventByDate(dateStr) {
-        return events.filter(ev => ev.date === dateStr)[0];
+        return this.events.filter(ev => ev.date === dateStr)[0];
     }
 
     getDateByDateStr(dateStr) {
@@ -307,9 +314,7 @@ export class UpCalendar {
 
     createTag(tag, { isHTML = false, content = '', classList = [] } = {}) {
         const htmlEl = document.createElement(tag);
-        if (classList) {
-            htmlEl.classList.add(...classList);
-        }
+        classList && htmlEl.classList.add(...classList);
         if (isHTML) {
             htmlEl.innerHTML = content;
         } else {

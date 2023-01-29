@@ -1,46 +1,32 @@
-/* START reset and base styles */
-* {
-    box-sizing: border-box;
-}
-
-html {
-    font-size: 18px;
-}
-
-body {
+@import "./reset.css";
+:root {
     --cell-size: 2rem;
     --cell-gap-size: .75rem;
-    --black-btn-bg: #001e00;
-
     --white: #fff;
     --gray-01: #5e6d55;
     --gray-06: #f2f7f2;
     --up-green: #14a800;
-
     --brand-green: #108a00;
     --forest: #13544e;
-    --blue: #1f57c3;
+    /*--black-btn-bg: #001e00;*/
+    /*--blue: #1f57c3;*/
+}
 
-
+body {
     display: grid;
     align-items: start;
     justify-content: center;
-    height: 100vh;
-    margin: 0;
     padding: 5rem 0 0;
-
-    font-family: Arial, sans-serif;
 }
 
-/* END reset and base styles */
 
+/* START calendar styling */
 .up-calendar {
     display: flex;
     flex-direction: row;
     align-items: stretch;
 }
 
-/* START calendar styling */
 .up-cal {
     position: relative;
     padding: 1rem;
