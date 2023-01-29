@@ -25,6 +25,7 @@ export class UpCalendar {
         monthOffset: '0',
         activeDay: null,
         useLocalStorage: true,
+        init: false,
     };
 
     constructor(selector, config) {
@@ -69,16 +70,17 @@ export class UpCalendar {
         this.drawMonthView();
 
         this.drawEventView();
+        this.config.init = true;
     }
 
-    drawMonthView(isInit = true) {
+    drawMonthView() {
         const { year, month } = this.config.date;
         const firstDayOfMonth = new Date(year, month, 1);
         const goesNextMonth = +this.config.monthOffset >= 0;
 
         // setting one container for all months
         let monthsWrapperEl;
-        if (isInit) {
+        if (!this.config.init) {
             monthsWrapperEl = this.createTag('div', { classList: ['up-cal__months-wrapper'] });
         } else {
             monthsWrapperEl = this.calEl.querySelector('.up-cal__months-wrapper');
@@ -124,7 +126,7 @@ export class UpCalendar {
         }
 
         // append/prepend month view depending on the desired direction (prev/next)
-        if (isInit) {
+        if (!this.config.init) {
             monthsWrapperEl.insertAdjacentElement('beforeEnd', monthEl);
         } else {
             const old = monthsWrapperEl.querySelector('.up-cal__month-item');
@@ -167,7 +169,7 @@ export class UpCalendar {
         this.drawMonthNavigationControls();
     }
 
-    drawMonthBtn(isInitial = true) {
+    drawMonthBtn() {
         const { year, month } = this.config.date;
         const nextDate = new Date(year, month + 1, 0);
 
@@ -177,7 +179,7 @@ export class UpCalendar {
         // some locales provide us month name in lowercase
         monthName = monthName.charAt(0).toUpperCase() + monthName.slice(1);
 
-        if (isInitial) {
+        if (!this.config.init) {
             this.selectDateBtn = this.createTag('button', {
                 content: `${monthName} ${year}`,
                 classList: ['up-cal__date-month-year'],
@@ -264,8 +266,8 @@ export class UpCalendar {
     }
 
     redrawMonth() {
-        this.drawMonthBtn(false);
-        this.drawMonthView(false);
+        this.drawMonthBtn();
+        this.drawMonthView();
     }
 
     showSelectMonthView() {
