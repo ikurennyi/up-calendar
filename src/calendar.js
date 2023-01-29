@@ -1,21 +1,20 @@
-// NOTE:
-// calendar written only for locale 'en-US'.
-// January 1st - Sunday. Which is "0" index in USA and "6" index in UA
-
-
-
 export class UpCalendar {
     calWrapper;
     calEl;
+    eventsEl;
+    headerEl;
+    prevMonthBtn;
+    nextMonthBnt;
+    selectDateBtn;
     config = {
         weekdays: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
         firstDayOfWeek: 'Sunday',
         locale: 'en-US',
         date: {},
-        monthOffset: 0,
+        monthOffset: '0',
         activeDay: null,
-        useLocalStorage: true
-    }
+        useLocalStorage: true,
+    };
 
     constructor(selector, config) {
         this.calWrapper = document.querySelector(selector);
@@ -29,34 +28,28 @@ export class UpCalendar {
     }
 
     initCalendar() {
-        // clear calendar
+        // clear calendar wrapper
         this.calWrapper.innerHTML = '';
         this.calWrapper.classList.add('up-calendar');
 
         // add calendar container
-        this.calEl = this.createTag("div", { classList: ["cal-el__calendar"] });
+        this.calEl = this.createTag('div', { classList: ['cal-el__calendar', 'up-cal'] });
         this.calWrapper.appendChild(this.calEl);
 
         // add event container
-        const eventEl = this.createTag("div", { classList: ["up-cal__event", "up-event"] });
-        eventEl.id = "up-event";
-        this.calWrapper.appendChild(eventEl);
+        this.eventsEl = this.createTag('div', { classList: ['up-cal__event', 'up-event'] });
+        this.calWrapper.appendChild(this.eventsEl);
 
-        // for a styles purposes
-        this.calEl.classList.add('up-cal');
-
+        // set current date in config
         const now = new Date();
-        if (this.config.monthOffset !== 0) {
-            now.setMonth(new Date().getMonth() + this.config.monthOffset);
-        }
-        this.config.date.day = now.getDay();
-        this.config.date.date = now.getDate();
-        this.config.date.month = now.getMonth();
-        this.config.date.year = now.getFullYear();
+        this.updateDateInConfig({
+            year: now.getFullYear(),
+            month: now.getMonth(),
+        });
 
         // draw navigation controls
         this.drawCalendarNavigation();
-        this.initMonthControls()
+        this.initMonthControls();
 
         // draw weekdays
         this.drawWeekdays();
@@ -67,129 +60,194 @@ export class UpCalendar {
         this.drawEventsView();
     }
 
-    drawMonthView() {
+    drawMonthView(isInit = true) {
         const { year, month } = this.config.date;
-        const now = new Date();
         const firstDayOfMonth = new Date(year, month, 1);
+        const goesNextMonth = +this.config.monthOffset >= 0;
 
-        const dateString = firstDayOfMonth.toLocaleDateString( this.config.locale,{
-            weekday: 'long',
-            year: 'numeric',
-            month: 'numeric',
-            day: 'numeric'
-        })
+        // setting one container for all months
+        let monthsWrapperEl;
+        if (isInit) {
+            monthsWrapperEl = this.createTag('div', { classList: ['up-cal__months-wrapper'] });
+        } else {
+            monthsWrapperEl = this.calEl.querySelector('.up-cal__months-wrapper');
+        }
 
-        const daysInMonth = new Date(year, month + 1, 0).getDate();
-        const offsetDays = this.config.weekdays.indexOf(dateString.split(', ')[0])
+        monthsWrapperEl.innerHTML = '';
 
+        const monthElClassList = isInit
+            ? ['up-cal__month-item']
+            : [
+                  'up-cal__month-item',
+                  'up-cal__month-item_new',
+                  goesNextMonth ? 'up-cal__month-item_new-top' : 'up-cal__month-item_new-bottom',
+              ];
+        const monthEl = this.createTag('div', { classList: monthElClassList });
 
         // render previous month
         const lastDayOfLastMonth = new Date(year, month, 0).getDate();
         for (let i = firstDayOfMonth.getDay(); i > 0; i--) {
-            const dayEl = this.createTag("div", { content: `${lastDayOfLastMonth - i + 1}`, classList: ["up-cal__day-offset"] });
-            this.calEl.appendChild(dayEl);
+            const dayEl = this.createTag('div', {
+                content: `${lastDayOfLastMonth - i + 1}`,
+                classList: ['up-cal__day-offset'],
+            });
+            monthEl.appendChild(dayEl);
         }
 
         // render current month
-        for (let i = 1; i <= daysInMonth; i ++) {
-            const dayEl = this.createTag("button", { classList: ["up-cal__day"] })
-            dayEl.type = "button";
-            dayEl.dataset.date = `${year}-${month}-${i - offsetDays}`;
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        for (let i = 1; i <= daysInMonth; i++) {
+            const dayEl = this.createTag('button', { classList: ['up-cal__day'] });
+            dayEl.type = 'button';
+            dayEl.dataset.date = `${year}-${month}-${i}`;
 
             // mark current date
-            if (dayEl.dataset.date === `${now.getFullYear()}-${now.getMonth()}-${now.getDate()}`) {
+            if (this.isDateToday({ year, month, day: i })) {
                 this.markDayAsToday(dayEl);
             }
 
-            dayEl.innerText = (i).toString();
+            dayEl.innerText = i.toString();
             // dayEl.addEventListener('click', (ev) => console.log(ev, dayEl))
-            this.calEl.appendChild(dayEl);
+            monthEl.appendChild(dayEl);
             this.markAsContainingEvent(dayEl);
-
         }
 
         // render next month
         const lastDayOfMonth = new Date(year, month, daysInMonth).getDay();
         for (let i = lastDayOfMonth; i < 6; i++) {
-            const dayEl = this.createTag("div", { content: `${i - lastDayOfMonth + 1}`, classList: ["up-cal__day-offset"] });
-            this.calEl.appendChild(dayEl);
+            const dayEl = this.createTag('div', {
+                content: `${i - lastDayOfMonth + 1}`,
+                classList: ['up-cal__day-offset'],
+            });
+            monthEl.appendChild(dayEl);
         }
 
-        this.initEventsHandler()
+        // append/prepend month view depending on the desired direction (prev/next)
+        if (goesNextMonth) {
+            monthsWrapperEl.insertAdjacentElement('beforeEnd', monthEl);
+        } else {
+            monthsWrapperEl.insertAdjacentElement('afterBegin', monthEl);
+        }
+
+        this.calEl.appendChild(monthsWrapperEl);
+        this.initEventsHandler();
     }
 
     drawEventsView() {
-        const eventsEl = this.calWrapper.querySelector('#up-event');
-        eventsEl.innerHTML = "";
+        this.eventsEl.innerHTML = '';
 
         const selectedDayHasEvent = this.hasEvent(this.config.activeDay);
-        const dateEl = this.createTag("h6", { content: this.getDateByDateStr(this.config.activeDay) })
-        eventsEl.appendChild(dateEl);
+        const dateEl = this.createTag('h6', { content: this.getDateByDateStr(this.config.activeDay) });
+        this.eventsEl.appendChild(dateEl);
 
         if (selectedDayHasEvent) {
-            const eventTextEl = this.createTag("div");
-            eventTextEl.appendChild(this.prepareEventText("h2", this.config.activeDay));
-            eventsEl.appendChild(eventTextEl);
-            this.addEventForm(eventsEl);
+            const eventTextEl = this.createTag('div');
+            eventTextEl.appendChild(this.prepareEventText('h2', this.config.activeDay));
+            this.eventsEl.appendChild(eventTextEl);
+            this.addEventForm();
         } else {
-            const noItemsEl = this.createTag("div", { isHTML: true, content: "<i>This day is free!</i>", classList: ["up-event_center"] });
-            // noItemsEl.classList.add()
-            eventsEl.appendChild(noItemsEl);
-            this.addEventForm(eventsEl);
+            const noItemsEl = this.createTag('div', {
+                isHTML: true,
+                content: '<i>This day is free!</i>',
+                classList: ['up-event_center'],
+            });
+            this.eventsEl.appendChild(noItemsEl);
+            this.addEventForm();
         }
     }
 
     drawCalendarNavigation() {
-        const { year, month } = this.config.date;
-        let monthName = new Date(year, month + 1, 0).toLocaleDateString(this.config.locale, {
-            month: 'long'
-        });
-
-        // some locales provide us month name in lowercase
-        monthName = monthName.charAt(0).toUpperCase() + monthName.slice(1)
-
-        const headerEl = this.createTag('header', {classList: ["up-cal__header"] });
-
-        const dateNavEl = this.createTag('button', { content: `${monthName} ${year}`, classList: ["up-cal__date-month-year"] })
-        dateNavEl.type = "button";
-
-        const monthPrevBtn = this.createTag('button', {isHTML: true, content: "&#8592;", classList: ["up-cal__month-prev"] });
-        monthPrevBtn.type = "button";
-        monthPrevBtn.id = 'up-cal-prev';
-
-        const monthNextBtn = this.createTag("button", { isHTML: true, content: "&#8594;", classList: ["up-cal__month-next"] });
-        monthNextBtn.type = "button";
-        monthNextBtn.id = 'up-cal-next';
-
-        const monthNavigationButtons = this.createTag("div", { classList: ["up-cal__month-navigation"] });
-        monthNavigationButtons.appendChild(monthPrevBtn);
-        monthNavigationButtons.appendChild(monthNextBtn);
-
-        headerEl.appendChild(dateNavEl);
-        headerEl.appendChild(monthNavigationButtons);
-        this.calEl.appendChild(headerEl);
+        this.headerEl = this.createTag('header', { classList: ['up-cal__header'] });
+        this.calEl.appendChild(this.headerEl);
+        this.drawMonthBtn();
+        this.drawMonthNavigationControls();
     }
 
-    initMonthControls() {
-        const prevMonthButton = document.getElementById('up-cal-prev');
-        const nextMonthButton = document.getElementById('up-cal-next');
+    drawMonthBtn(isInitial = true) {
+        const { year, month } = this.config.date;
+        const nextDate = new Date(year, month + 1, 0);
+        let monthName = nextDate.toLocaleDateString(this.config.locale, {
+            month: 'long',
+        });
+        // some locales provide us month name in lowercase
+        monthName = monthName.charAt(0).toUpperCase() + monthName.slice(1);
 
-        prevMonthButton.addEventListener('click', () => {
-            this.config.monthOffset--;
-            this.initCalendar();
-        })
-        nextMonthButton.addEventListener('click', () => {
-            this.config.monthOffset++;
-            this.initCalendar();
-        })
+        if (isInitial) {
+            this.selectDateBtn = this.createTag('button', {
+                content: `${monthName} ${year}`,
+                classList: ['up-cal__date-month-year'],
+            });
+            this.selectDateBtn.type = 'button';
+
+            this.headerEl.appendChild(this.selectDateBtn);
+        } else {
+            this.selectDateBtn.innerText = `${monthName} ${year}`;
+        }
+    }
+
+    drawMonthNavigationControls() {
+        this.prevMonthBtn = this.createTag('button', {
+            isHTML: true,
+            content: '&#8592;',
+            classList: ['up-cal__month-prev'],
+        });
+        this.prevMonthBtn.type = 'button';
+
+        this.nextMonthBnt = this.createTag('button', {
+            isHTML: true,
+            content: '&#8594;',
+            classList: ['up-cal__month-next'],
+        });
+        this.nextMonthBnt.type = 'button';
+
+        const monthNavigationButtons = this.createTag('div', { classList: ['up-cal__month-navigation'] });
+        monthNavigationButtons.appendChild(this.prevMonthBtn);
+        monthNavigationButtons.appendChild(this.nextMonthBnt);
+
+        this.headerEl.appendChild(monthNavigationButtons);
+    }
+
+    // TODO: re-write this code somehow
+    initMonthControls() {
+        this.prevMonthBtn.addEventListener('click', () => this.goPrevMonth());
+        this.nextMonthBnt.addEventListener('click', () => this.goNextMonth());
+    }
+
+    goPrevMonth() {
+        const { year, month } = this.config.date;
+        const now = new Date(year, month, 1);
+        this.config.monthOffset = '-1';
+        now.setMonth(now.getMonth() - 1);
+        this.updateDateInConfig({
+            year: now.getFullYear(),
+            month: now.getMonth(),
+        });
+        this.redrawMonth();
+    }
+
+    goNextMonth() {
+        const { year, month } = this.config.date;
+        const now = new Date(year, month, 1);
+        now.setMonth(now.getMonth() + 1);
+        this.config.monthOffset = '1';
+        this.updateDateInConfig({
+            year: now.getFullYear(),
+            month: now.getMonth(),
+        });
+        this.redrawMonth();
+    }
+
+    redrawMonth() {
+        this.drawMonthBtn(false);
+        this.drawMonthView(false);
     }
 
     drawWeekdays() {
         const weekDays = this.config.weekdays;
-        const weekdaysEl = this.createTag("ul");
+        const weekdaysEl = this.createTag('ul');
         weekdaysEl.classList.add('up-cal__weekdays');
         for (let i = 0; i < weekDays.length; i++) {
-            const weekDayEl = this.createTag("li", { content: weekDays[i].substring(0, 3) })
+            const weekDayEl = this.createTag('li', { content: weekDays[i].substring(0, 3) });
             weekDayEl.classList.add('up-cal__weekday');
             weekdaysEl.appendChild(weekDayEl);
         }
@@ -198,7 +256,7 @@ export class UpCalendar {
 
     markAsContainingEvent(dayEl) {
         const date = dayEl.dataset.date;
-        if (this.events.filter(ev => ev.date === date)[0]) {
+        if (this.events.filter((ev) => ev.date === date)[0]) {
             dayEl.classList.add('up-cal__day-marked');
         }
     }
@@ -211,7 +269,7 @@ export class UpCalendar {
     }
 
     initEventsHandler() {
-        this.calEl.addEventListener('click', e => {
+        this.calEl.addEventListener('click', (e) => {
             if (!e.target.classList.contains('up-cal__day')) {
                 return;
             }
@@ -226,7 +284,7 @@ export class UpCalendar {
 
             // mark clicked day
             console.log('ADD EVENT HERE!', selectedDate);
-        })
+        });
     }
 
     markDayAsActive(dayBtn) {
@@ -235,49 +293,47 @@ export class UpCalendar {
     }
 
     clearClassListFromDays(className) {
-        this.calEl
-            .querySelectorAll('.up-cal__day')
-            .forEach(el => el.classList.remove(className));
+        this.calEl.querySelectorAll('.up-cal__day').forEach((el) => el.classList.remove(className));
     }
 
-    addEventForm(eventsEl) {
-        const formEl = this.createTag("form");
-        const inputEl = this.createTag("input");
-        inputEl.placeholder = 'Add something to this day...'
+    addEventForm() {
+        const formEl = this.createTag('form');
+        const inputEl = this.createTag('input');
+        inputEl.placeholder = 'Add something to this day...';
         formEl.appendChild(inputEl);
 
-        const submitBtn = this.createTag("button", { content: "Add event" });
-        submitBtn.type = "submit";
+        const submitBtn = this.createTag('button', { content: 'Add event' });
+        submitBtn.type = 'submit';
         formEl.appendChild(submitBtn);
-        eventsEl.appendChild(formEl);
+        this.eventsEl.appendChild(formEl);
 
         inputEl.focus();
 
-        formEl.addEventListener('submit', e => {
+        formEl.addEventListener('submit', (e) => {
             e.preventDefault();
             if (inputEl.value.trim().length === 0) {
                 return;
             }
             const event = { date: this.config.activeDay, title: inputEl.value };
             this.addItemToStorage(event);
-            this.drawEventsView()
-        })
+            this.drawEventsView();
+        });
     }
 
     addItemToStorage(event) {
-        const existingEv = this.events.filter(ev => ev.date === event.date)[0];
+        const existingEv = this.events.filter((ev) => ev.date === event.date)[0];
         if (existingEv) {
             existingEv.title = event.title;
         } else {
             this.events.push(event);
             const el = this.getDayElByDate(event.date);
-            this.markAsContainingEvent(el)
+            this.markAsContainingEvent(el);
         }
         this.config.useLocalStorage && localStorage.setItem('events', JSON.stringify(this.events));
     }
 
     getDayElByDate(dateStr) {
-        return this.calEl.querySelector('[data-date="' + dateStr + '"]')
+        return this.calEl.querySelector('[data-date="' + dateStr + '"]');
     }
 
     hasEvent(dateStr) {
@@ -285,29 +341,38 @@ export class UpCalendar {
     }
 
     getEventByDate(dateStr) {
-        return this.events.filter(ev => ev.date === dateStr)[0];
+        return this.events.filter((ev) => ev.date === dateStr)[0];
     }
 
     getDateByDateStr(dateStr) {
-        const [year, month, day] = dateStr.split('-');
-        const isCurrentDate =
-            +year === this.config.date.year &&
-            +month === this.config.date.month &&
-            +day === this.config.date.date;
-        if (isCurrentDate) {
+        const [year, month, date] = dateStr.split('-');
+
+        if (this.isDateToday({ year, month, date })) {
             return 'Today';
         }
-        const date = new Date(year, month, day);
-        return date.toLocaleDateString(this.config.locale, {
+        const newDate = new Date(year, month, date);
+        return newDate.toLocaleDateString(this.config.locale, {
             year: 'numeric',
             month: 'long',
-            day: 'numeric'
+            day: 'numeric',
         });
+    }
+
+    isDateToday({ year, month, day }) {
+        const now = new Date();
+        return +year === now.getFullYear() && +month === now.getMonth() && +day === now.getDate();
     }
 
     prepareEventText(tag, dateStr) {
         const content = this.getEventByDate(dateStr).title;
         return this.createTag(tag, { content });
+    }
+
+    updateDateInConfig(newDate) {
+        this.config.date = {
+            ...this.config.date,
+            ...newDate,
+        };
     }
 
     createTag(tag, { isHTML = false, content = '', classList = [] } = {}) {

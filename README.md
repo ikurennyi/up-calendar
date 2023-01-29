@@ -1,3 +1,4 @@
+
 # Home-assignment to the role Front-end Developer at Upwork
 
 ## Calendar
@@ -11,3 +12,7 @@
 
 
 ## Notes:
+* Calendar written only for locale 'en-US'.
+
+
+[//]: # (* January 1st - Sunday. Which is "0" index in USA and "6" index in UA)
