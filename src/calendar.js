@@ -1,4 +1,4 @@
-import makeAnim, { makeCleanup } from './make-anim.js';
+import makeAnim from './make-anim.js';
 
 export class UpCalendar {
     calWrapper;
@@ -49,7 +49,7 @@ export class UpCalendar {
         this.calWrapper.appendChild(this.calEl);
 
         // add event container
-        this.eventsEl = this.createTag('div', { classList: ['up-cal__event', 'up-event'] });
+        this.eventsEl = this.createTag('section', { classList: ['up-cal__event', 'up-event'] });
         this.calWrapper.appendChild(this.eventsEl);
 
         // set current date in config
@@ -68,6 +68,7 @@ export class UpCalendar {
 
         // draw month view by default
         this.drawMonthView();
+        this.initEventsHandler();
 
         this.drawEventView();
         this.config.init = true;
@@ -127,37 +128,45 @@ export class UpCalendar {
 
         // append/prepend month view depending on the desired direction (prev/next)
         if (!this.config.init) {
-            monthsWrapperEl.insertAdjacentElement('beforeEnd', monthEl);
+            monthsWrapperEl.insertAdjacentElement('beforeend', monthEl);
         } else {
             const old = monthsWrapperEl.querySelector('.up-cal__month-item');
             const direction = goesNextMonth ? 'up' : 'down';
-            const place = goesNextMonth ? 'beforeend' : 'afterbegin';
+            const place = goesNextMonth ? 'aftereend' : 'afterbegin';
             makeAnim({ newEl: monthEl, old, place, direction });
         }
 
         this.calEl.appendChild(monthsWrapperEl);
-        this.initEventsHandler();
     }
 
     drawEventView() {
-        this.eventsEl.innerHTML = '';
-
         const selectedDayHasEvent = this.hasEvent(this.config.activeDay);
-        const dateEl = this.createTag('h6', { content: this.getDateByDateStr(this.config.activeDay) });
-        this.eventsEl.appendChild(dateEl);
 
-        if (selectedDayHasEvent) {
-            const eventTextEl = this.createTag('div');
-            eventTextEl.appendChild(this.prepareEventText('h2', this.config.activeDay));
-            this.eventsEl.appendChild(eventTextEl);
-            this.addEventForm();
+        // draw date of event
+        const dateEl = this.createTag('h6', { content: this.getDateByDateStr(this.config.activeDay) });
+        if (this.config.init) {
+            const old = this.eventsEl.querySelector('h6');
+            makeAnim({ newEl: dateEl, old, place: 'afterend', effect: 'appear' });
         } else {
-            const noItemsEl = this.createTag('div', {
-                isHTML: true,
-                content: '<i>This day is free!</i>',
-                classList: ['up-event_center'],
-            });
-            this.eventsEl.appendChild(noItemsEl);
+            const eventHeaderEl = this.createTag('header');
+            this.eventsEl.appendChild(eventHeaderEl);
+            eventHeaderEl.appendChild(dateEl);
+        }
+
+        // draw short message of event
+        let textEl;
+        if (selectedDayHasEvent) {
+            textEl = this.prepareEventText('h2', this.config.activeDay);
+        } else {
+            textEl = this.createTag('i', { content: 'This day is free!', classList: ['up-event_center'] });
+        }
+        if (this.config.init) {
+            const old = this.eventsEl.querySelector('div').children[0];
+            makeAnim({ newEl: textEl, old, place: 'beforebegin', effect: 'appear' });
+        } else {
+            const eventTextEl = this.createTag('div');
+            eventTextEl.appendChild(textEl);
+            this.eventsEl.appendChild(eventTextEl);
             this.addEventForm();
         }
     }
@@ -427,8 +436,9 @@ export class UpCalendar {
         this.config.activeDay = date;
     }
 
+    // TODO: add all events here
     initEventsHandler() {
-        this.calEl.addEventListener('click', (e) => {
+        this.calWrapper.addEventListener('click', (e) => {
             if (!e.target.classList.contains('up-cal__day')) {
                 return;
             }
