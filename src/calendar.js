@@ -202,7 +202,7 @@ export class UpCalendar {
                 content: `${monthName} ${year}`,
                 classList: ['up-cal__date-month-year'],
             });
-            this.selectDateBtn.type = 'button';
+            btn.type = 'button';
 
             // animate new button
             const direction = this.config.monthOffset > 0 ? 'up' : 'down';
@@ -395,6 +395,7 @@ export class UpCalendar {
             makeAnim({
                 newEl: btnsList,
                 old,
+                effect: 'shift',
                 place: 'afterend',
                 direction: dir,
             }).then(() => this._focusButtonOnRender(this.yearBtnsList));
@@ -434,6 +435,8 @@ export class UpCalendar {
         const selectDateEl = this.calEl.querySelector('.up-cal__select');
         selectDateEl.querySelector('.up-cal__select-years').remove();
         selectDateEl.appendChild(this.monthBtnsList);
+
+        this.yearBtnsList = undefined;
 
         this._focusButtonOnRender(this.monthBtnsList);
     }

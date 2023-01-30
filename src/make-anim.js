@@ -34,7 +34,6 @@ export default function makeAnim({
         newEl.style.opacity = '0';
 
         let shift;
-        // const parent = old.parentElement;
 
         // available directions: up | down | left | right
         // insertAdjacentElement: beforebegin | afterbegin | 'beforeend' | afterend

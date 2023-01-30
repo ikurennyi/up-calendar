@@ -18,6 +18,7 @@
 * Calendar written only for locale 'en-US'.
 * Reason to use pure JavaScript: I'm not familiar with React and Vue now. But use Angular here for me is just like use escalator to go up 2 steps. So I'd like to remember how it is in 2023: write code without JS frameworks, Typescript and Webpack/Parcel/Vite 🤷‍♂️
 * You can find some user friendly keyboard navigations.
+* I didn't add the "backend" 'cause messages by default are small and I store it in `localStorage` instead.
 
 
 ### TODOs for the future:
