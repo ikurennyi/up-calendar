@@ -47,3 +47,6 @@ docker-compose.yml
 
 Dockerfile.local
 debug.log
+/test-results/
+/playwright-report/
+/playwright/.cache/
