@@ -306,12 +306,20 @@ export class UpCalendar {
         if (titleFor === 'year') {
             this.createSelectMonthHeaderForYear();
         } else {
-            // TODO: animation
-            this.selectMonthViewHeaderEl.style.justifyContent = 'center';
-            const header = this.selectMonthViewHeaderEl.querySelector('h4');
-            const buttons = this.selectMonthViewHeaderEl.querySelectorAll('button');
-            header.innerText = 'Select month';
-            buttons.forEach((b) => b.remove());
+            const headerContentEl = this.createTag('div', {
+                classList: ['up-select__header-content'],
+                isHTML: true,
+                content: '<i></i><h4>Select month</h4><i></i>',
+            });
+
+            const old = this.selectMonthViewHeaderEl.querySelector('.up-select__header-content');
+            makeAnim({
+                newEl: headerContentEl,
+                old,
+                place: 'afterend',
+                effect: 'appear',
+                duration: 400,
+            });
         }
     }
 
@@ -413,7 +421,6 @@ export class UpCalendar {
         const now = new Date();
         this.config.dateToSelect.year = year;
 
-        // TODO: add animation here
         this.setSelectMonthHeader('month');
 
         this.monthBtnsList = this.createTag('div', { classList: ['up-cal__select-months'] });
@@ -477,7 +484,6 @@ export class UpCalendar {
         this.config.activeDay = date;
     }
 
-    // TODO: add all events here
     initEventsHandler() {
         this.calWrapper.addEventListener('click', (e) => {
             if (!e.target.classList.contains('up-cal__day')) {

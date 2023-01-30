@@ -78,6 +78,7 @@
     cursor: pointer;
     outline: 1px solid transparent;
     transition: outline .2s ease-out;
+    flex-shrink: 0;
 }
 
 .up-cal__btn-head:focus-within,

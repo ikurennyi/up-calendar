@@ -37,6 +37,7 @@
 }
 
 .up-select__header-content {
+    width: 100%;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -46,6 +47,8 @@
     position: relative;
     margin: 1rem 0;
     font-weight: normal;
+    text-align: center;
+    flex-grow: 1;
 }
 
 .up-cal__select ul {
