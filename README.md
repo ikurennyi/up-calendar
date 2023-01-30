@@ -1,5 +1,5 @@
 
-# Home-assignment to the role Front-end Developer at Upwork
+# Home-assignment to the role Front-end Developer at ******
 
 ## Calendar
 [Link to repository](https://github.com/ekurennyy/up-calendar)
