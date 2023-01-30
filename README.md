@@ -9,6 +9,12 @@
 ### How To Run:
 * Open `index.html` file in any server like "liver-server" in VSCode or with "Open in Browser" feature from WebStorm...
 
+* For run tests, use following commands:
+```
+npm i
+npm run test
+```
+
 ### Some calendar's abilities:
 * Usable from keyboard.
 * There is no backend for storing data, but as far as we have a small text messages - user can use `localStorage` by providing flag `useLocalStorage` in corresponding config for calendar instance (enabled by default). Or he can lost his data after page refresh.
