@@ -1,6 +1,6 @@
 import makeAnim from './make-anim.js';
 
-export class UpCalendar {
+export default class UpCalendar {
     calWrapper;
     calEl;
     eventsEl;
