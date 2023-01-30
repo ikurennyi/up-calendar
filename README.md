@@ -2,6 +2,9 @@
 # Home-assignment to the role Front-end Developer at Upwork
 
 ## Calendar
+[Link to repository](https://github.com/ekurennyy/up-calendar)
+
+[Demo](https://ekurennyy.github.io/up-calendar/)
 
 ### How To Run:
 * Open `index.html` file in any server like "liver-server" in VSCode or with "Open in Browser" feature from WebStorm...
@@ -11,7 +14,7 @@
 * There is no backend for storing data, but as far as we have a small text messages - user can use `localStorage` by providing flag `useLocalStorage` in corresponding config for calendar instance (enabled by default). Or he can lost his data after page refresh.
 
 ## Notes:
-* Calendar written only for locale 'en-US'.
+* Calendar written only for locale `en-US`.
 * Why it's in pure JavaScript: I'm not familiar with React and Vue (now). But use Angular here for me is just like use escalator to go up 2 steps. So I'd like to remember how it is in 2023: write code without JS frameworks, Typescript and Webpack/Parcel/Vite 🤷‍♂️
 * This work took around 12 hours for me. FYI.
 
