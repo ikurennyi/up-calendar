@@ -74,6 +74,41 @@ export class UpCalendar {
         this.config.init = true;
     }
 
+    // public. Load data in bulk
+    loadData(eventsArray) {
+        eventsArray.forEach(({ date, title }) => this.newByDate(date, title));
+    }
+
+    // public. GET message by date
+    getByDate(date) {
+        const d = new Date(Date.parse(date));
+        const dStr = this._dateToDateStr(d);
+        return this.events.find((e) => e.date === dStr).title;
+    }
+
+    // public. POST message by date
+    newByDate(date, message) {
+        const d = new Date(Date.parse(date));
+        const dStr = this._dateToDateStr(d);
+        const newEvent = { date: dStr, title: message };
+        this._addItemToStorage(newEvent);
+    }
+
+    // public. UPDATE message by date
+    updateAt(date, message) {
+        const d = new Date(Date.parse(date));
+        const dStr = this._dateToDateStr(d);
+        const newEvent = { date: dStr, title: message };
+        this._addItemToStorage(newEvent);
+    }
+
+    // public. DELETE message by date
+    deleteAtDate(date) {
+        const d = new Date(Date.parse(date));
+        const dStr = this._dateToDateStr(d);
+        this._deleteEvent(dStr);
+    }
+
     drawMonthView() {
         const { year, month } = this.config.date;
         const firstDayOfMonth = new Date(year, month, 1);
@@ -528,22 +563,22 @@ export class UpCalendar {
                 return;
             }
             const event = { date: this.config.activeDay, title: inputEl.value };
-            this.addItemToStorage(event);
+            this._addItemToStorage(event);
             this.drawEventView();
             inputEl.value = '';
         });
     }
 
-    addItemToStorage(event) {
+    _addItemToStorage(event) {
         const existingEv = this.events.filter((ev) => ev.date === event.date)[0];
         if (existingEv) {
             existingEv.title = event.title;
         } else {
             this.events.push(event);
             const el = this.getDayElByDate(event.date);
-            this.markAsContainingEvent(el);
+            el && this.markAsContainingEvent(el);
         }
-        this.config.useLocalStorage && localStorage.setItem('events', JSON.stringify(this.events));
+        this._updateLocalStorage();
     }
 
     getDayElByDate(dateStr) {
@@ -603,5 +638,18 @@ export class UpCalendar {
         setTimeout(() => {
             htmlEl.querySelector('button').focus();
         }, 0);
+    }
+
+    _dateToDateStr(date) {
+        return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+    }
+
+    _deleteEvent(dStr) {
+        this.events = this.events.filter((e) => e.date !== dStr);
+        this._updateLocalStorage();
+    }
+
+    _updateLocalStorage() {
+        this.config.useLocalStorage && localStorage.setItem('events', JSON.stringify(this.events));
     }
 }
