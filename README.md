@@ -4,7 +4,7 @@
 ## Calendar
 [Link to repository](https://github.com/ekurennyy/up-calendar)
 
-[Demo](https://ekurennyy.github.io/up-calendar/)
+[Demo](https://ikurennyi.github.io/up-calendar/)
 
 ### How To Run:
 * Open `index.html` file in any server like "liver-server" in VSCode or with "Open in Browser" feature from WebStorm...
